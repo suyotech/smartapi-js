@@ -22,8 +22,9 @@ async function main(){
     
     await api.generateSession()
     
-    // const profile = await api.getUserProfile();
-    // console.log("profile ",profile);
+    console.log("apidata",api.macAddress);
+    const profile = await api.getUserProfile();
+    console.log("profile ",profile);
    
     const inst = await SmartapiInstruments.FindInstrument({
         exch_seg : 'NSE',
@@ -32,9 +33,10 @@ async function main(){
     })
 
 
-    console.log('inst',inst);
-    // const marketdata  = await api.getMarketData('LTP',inst)
-    // console.log('marketdata',marketdata);
+    // console.log('inst',inst);
+
+    const marketdata  = await api.getMarketData('LTP',inst)
+    console.log('marketdata',marketdata);
 
 //     const candleData = await api.getCandleData({
 //         "exchange": "NSE",
@@ -92,13 +94,13 @@ async function main(){
     // const orderBook  =await api.getOrderBook();
     // console.log('orderbook',orderBook);
 
-    const socket = new WebSocket20(api.apiKey,api.jwtToken,api.feedToken,api.clientID);
+    // const socket = new WebSocket20(api.apiKey,api.jwtToken,api.feedToken,api.clientID);
 
     
 
-    console.log('sending data ');
+    // console.log('sending data ');
 
-    socket.subscribe(inst)
+    // socket.subscribe(inst)
 
 }
 

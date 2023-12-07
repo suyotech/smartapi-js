@@ -1,5 +1,5 @@
 import axios from "axios";
-import { networkInterfaces } from "os";
+import os from "os";
 import totp from "totp-generator";
 
 
@@ -23,57 +23,60 @@ class SmartApi {
   }
 
   async init() {
-    const { localip, mac } = getIPandMac();
-    this.localIP = localip;
-    this.macAddress = mac;
+ try {
+  this.localIP = getLocalIP();
+  this.macAddress = getMAC();
 
-    const publicIP = await getPublicIP();
-    this.publicIP = publicIP;
+  const publicIP = await getPublicIP();
+  this.publicIP = publicIP;
 
-    this.httpClient = axios.create({
-      baseURL: routes.burl,
-      timeout: this.timeout,
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        "X-User-Type": "USER",
-        "X-SourceID": "WEB",
-        "X-ClientLocalIP": this.localIP,
-        "X-ClientPublicIP": this.publicIP,
-        "X-MACAddress": this.macAddress,
-        "X-PrivateKey": this.apiKey,
-        Authorization: `Bearer ${this.jwtToken}`,
-      },
-    });
+  this.httpClient = axios.create({
+    baseURL: routes.burl,
+    timeout: this.timeout,
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      "X-User-Type": "USER",
+      "X-SourceID": "WEB",
+      "X-ClientLocalIP": this.localIP,
+      "X-ClientPublicIP": this.publicIP,
+      "X-MACAddress": this.macAddress,
+      "X-PrivateKey": this.apiKey,
+      Authorization: `Bearer ${this.jwtToken}`,
+    },
+  });
 
-    this.httpClient.interceptors.response.use(
-      (response) => {
-        if(!response.data.status){
-          console.log('error',response.data.message);
-          return null
-        }
-        return response.data.data;
-      },
-      (error) => {
-        if (error.resquest) {
-          console.log("request error ", error);
-        } else if (error.response) {
-          console.log(
-            "response error ",
-            this.debug ? error : error.response.data
-          );
-        } else {
-          console.log("error ", this.debug ? error : error.message);
-        }
+  this.httpClient.interceptors.response.use(
+    (response) => {
+      if(!response.data.status){
+        console.log('error',response.data.message);
+        return null
       }
-    );
+      return response.data.data;
+    },
+    (error) => {
+      if (error.resquest) {
+        console.log("request error ", error);
+      } else if (error.response) {
+        console.log(
+          "response error ",
+          this.debug ? error : error.response.data
+        );
+      } else {
+        console.log("error ", this.debug ? error : error.message);
+      }
+    }
+  );
 
-    this.httpClient.interceptors.request.use(config=>{
-      return config;
-    },error=>{
-      console.log('request error ',error)
-      return Promise.reject(error);
-    })
+  this.httpClient.interceptors.request.use(config=>{
+    return config;
+  },error=>{
+    console.log('request error ',error)
+    return Promise.reject(error);
+  })
+ } catch (error) {
+    console.log("init error",error);
+ }
   }
 
   async InitDone() {
@@ -165,6 +168,7 @@ class SmartApi {
    * @returns
    */
   async cancelOrder(params) {
+  
     return await this.httpClient.post(routes.cancelOrderUrl, params);
   }
 
@@ -293,26 +297,43 @@ const routes = {
   candleDataUrl: "/rest/secure/angelbroking/historical/v1/getCandleData",
 };
 
-function getIPandMac() {
-  const nI = networkInterfaces();
-  let localip = null;
-  let mac = null;
+function getLocalIP() {
+  const interfaces = os.networkInterfaces();
+  let localIP = '';
 
-  Object.keys(nI).find((key) => {
-    const networks = nI[key];
-    const found = networks.find((c) => {
-      const address = c.address;
-      if (address.includes("192.168")) {
-        [localip, mac] = [c.address, c.mac.toUpperCase()];
-        return true;
-      }
-      return false;
-    });
+  // Loop through network interfaces
+  Object.keys(interfaces).forEach((interfaceName) => {
+    const interfaceInfo = interfaces[interfaceName];
+    // Find an IPv4 address that is not internal or loopback
+    const activeInterface = interfaceInfo.find(
+      (info) => !info.internal && info.family === 'IPv4'
+    );
 
-    return found !== undefined;
+    if (activeInterface) {
+      localIP = activeInterface.address;
+    }
   });
 
-  return { localip, mac };
+  return localIP;
+}
+
+// Function to get the MAC address
+function getMAC() {
+  const networkInterfaces = os.networkInterfaces();
+  let macAddress = '';
+
+  // Loop through network interfaces to find the MAC address
+  Object.keys(networkInterfaces).forEach((interfaceName) => {
+    const interfaceInfo = networkInterfaces[interfaceName];
+
+    const mac = interfaceInfo.find((details) => details.mac && details.mac !== '00:00:00:00:00:00');
+
+    if (mac) {
+      macAddress = mac.mac;
+    }
+  });
+
+  return macAddress;
 }
 
 const getPublicIP = async () => {
