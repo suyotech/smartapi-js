@@ -6,7 +6,7 @@ import WebSocket from "ws";
  * @params feedToken
  * @params clientCode
  */
-class WebSocket20 {
+class SmartApiWS20 {
   constructor(apikey, jwtToken, feedToken, clientCode) {
     this.apikey = apikey;
     this.jwtToken = jwtToken;
