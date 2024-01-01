@@ -66,22 +66,32 @@ async function FindInstrument(params) {
 }
 
 /**
- *
- * @param {string} exchange
+ * @param {Object} params
+ * @param {string} exch_seg
  * @param {string} name
  * @param {string} instrumenttype
  */
-function GetExpiryDates(exchange, name, instrumenttype) {
+function GetExpiryDates(params) {
   const filedata = loadFileData();
 
+  if(!filedata){
+    console.log("file data null");
+    return null
+  }
+  if(!params?.exch_seg || !params?.name || !params?.instrumenttype){
+    console.log("instrumenttype or name or exch_seg missing");
+    return null
+  }
+  
   const filteredData = filedata.filter((item) => {
     return (
-      item.exch_seg === exchange &&
-      item.name === name &&
-      item.instrumenttype.startsWith(instrumenttype)
+      item.exch_seg === params.exch_seg &&
+      item.name === params.name &&
+      item.instrumenttype.startsWith(params.instrumenttype)
     );
   });
 
+  console.log('filtered',filteredData);
   const uniqueExpiryDates = new Set(filteredData.map((item) => item.expiry));
   const sortedExpiryDates = Array.from(uniqueExpiryDates).sort((a, b) => {
     const dateA = new Date(a);

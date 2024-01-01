@@ -190,7 +190,7 @@ class SmartApi {
 
   async getMarketData(mode="LTP",instrumentlist = []) {
     
-    if(instrumentlist.length==0 || !mode){
+    if(!Array.isArray(instrumentlist) || !mode){
       console.log('instrument list null or mode is not defined');
       return null;
     }

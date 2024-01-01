@@ -1,12 +1,12 @@
 import WebSocket from "ws";
-
+import { EventEmitter } from "events";;
 /**
  * @params apikey
  * @params jwtToken
  * @params feedToken
  * @params clientCode
  */
-class SmartApiWS20 {
+class SmartApiWS20{
   constructor(apikey, jwtToken, feedToken, clientCode) {
     this.apikey = apikey;
     this.jwtToken = jwtToken;
@@ -19,6 +19,7 @@ class SmartApiWS20 {
     this.heartBeatTimer = null;
     this.subInstruments = new Set;
     this.initPromise = this.connect();
+    this.eventEmitter = new EventEmitter();
     
   }
 
@@ -45,8 +46,8 @@ class SmartApiWS20 {
 
     this.socket.onmessage = (event) => {
       const data = parseWSData(event.data);
-
-      console.log("Message Recived : ", data);
+      this.socket.emit("data",data)
+      //console.log("Message Recived : ", data);
     };
 
     this.socket.onclose = (event) => {
@@ -127,6 +128,10 @@ class SmartApiWS20 {
     await this.initPromise;
     this.send(tokens)
     console.log('Token Unsubscribed');
+  }
+
+  onRecivedData(callback){
+    this.eventEmitter.on('receivedData',callback);
   }
 }
 
