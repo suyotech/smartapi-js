@@ -146,7 +146,7 @@ const wsModes = {
   SnapQuote: 3,
 };
 
-export default WebSocket20;
+export default SmartApiWS20;
 
 function parseWSData(data) {
   if (typeof data === "string") {
