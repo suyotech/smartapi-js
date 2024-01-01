@@ -47,7 +47,7 @@ class SmartApiWS20{
     this.socket.onmessage = (event) => {
       const data = parseWSData(event.data);
       this.socket.emit("data",data)
-      //console.log("Message Recived : ", data);
+      console.log("Message Recived : ", data);
     };
 
     this.socket.onclose = (event) => {

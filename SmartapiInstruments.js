@@ -91,7 +91,6 @@ function GetExpiryDates(params) {
     );
   });
 
-  console.log('filtered',filteredData);
   const uniqueExpiryDates = new Set(filteredData.map((item) => item.expiry));
   const sortedExpiryDates = Array.from(uniqueExpiryDates).sort((a, b) => {
     const dateA = new Date(a);
