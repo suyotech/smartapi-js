@@ -6,8 +6,9 @@ import { EventEmitter } from "events";;
  * @params feedToken
  * @params clientCode
  */
-class SmartApiWS20{
+class SmartApiWS20 extends EventEmitter{
   constructor(apikey, jwtToken, feedToken, clientCode) {
+    super();
     this.apikey = apikey;
     this.jwtToken = jwtToken;
     this.feedToken = feedToken;
@@ -46,8 +47,8 @@ class SmartApiWS20{
 
     this.socket.onmessage = (event) => {
       const data = parseWSData(event.data);
-      this.socket.emit("data",data)
-      console.log("Message Recived : ", data);
+      this.emit(data.token,data);
+      //console.log("Message Recived : ", data);
     };
 
     this.socket.onclose = (event) => {
