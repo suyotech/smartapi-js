@@ -20,10 +20,10 @@ class SmartApiWS20 extends EventEmitter{
     this.heartBeatTimer = null;
     this.subInstruments = new Set;
     this.initPromise = this.connect();
-    this.eventEmitter = new EventEmitter();
     
   }
 
+  
   async connect() {
     this.socket = new WebSocket(
       "wss://smartapisocket.angelone.in/smart-stream",
@@ -131,9 +131,6 @@ class SmartApiWS20 extends EventEmitter{
     console.log('Token Unsubscribed');
   }
 
-  onRecivedData(callback){
-    this.eventEmitter.on('receivedData',callback);
-  }
 }
 
 const wsExchangeType = {
