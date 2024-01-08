@@ -132,38 +132,6 @@ async function CheckInstruments() {
   }
 }
 
-// function FindNearestStrike(
-//   price = 0,
-//   name = "",
-//   expiry = "",
-//   instrumenttype = "",
-//   optiontype = ""
-// ) {
-//   try {
-//     const filedata = loadFileData();
-
-//     //Rounding price to nearest strike
-//     const symbs = filedata
-//       .filter((inst) => {
-//         return (
-//           inst.name === name &&
-//           inst.expiry === expiry &&
-//           inst.instrumenttype == instrumenttype &&
-//           inst.symbol.endsWith("CE")
-//         );
-//       })
-//       .map((inst) => ({
-//         strike: inst.strike,
-//         diff: Math.abs(inst.strike - price * 100),
-//       }))
-//       .sort((a, b) => a.diff - b.diff);
-
-//     return Array.isArray(symbs) ? symbs[0].strike / 100 : null;
-//   } catch (error) {
-//     console.log(error.message);
-//   }
-// }
-
 /**
  *
  * @param {Number} price
@@ -179,12 +147,14 @@ function GetOptionStrikes(
   name = "",
   expiry = "",
   instrumenttype = "",
-  optiontype = "",
   maxStrikes = 5 // Maximum number of strikes to return for ITM and OTM
 ) {
   try {
+    if (!price || !name || !expiry || !instrumenttype) {
+      throw new Error("inputs mising");
+    }
     const filedata = loadFileData();
-
+    const optiontype = "CE";
     // Filter strikes based on parameters and option type
     const filteredStrikes = filedata.filter((inst) => {
       return (
