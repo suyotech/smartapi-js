@@ -40,36 +40,48 @@ async function DownloadInstruments() {
 }
 
 /**
- * Find Symbols from downloaded instruments
- * @param {object} params {
- * {exch_seg,name,instrumenttype,strike,expiry}
- * }
+ *
+ * @param {{exch_seg :"NSE"|"BSE"|"NFO"|"MCX"|"CDS"|"NCDEX",name:"BANKNIFTY",instrumenttype : ""|"FUTIDX"|"OPTIDX"|"FUTSTK"|"OPTSTK"|"FUTCOM"|"FUTOPT",expiry:"11JAN2024",strike:21000,optiontype:"CE"|"PE"}} params
+ * @returns {Array|Object} instruments
  */
 async function FindInstrument(params) {
   const filedata = loadFileData();
 
   const instrumentdata = filedata.filter((scrip) => {
+    const isCE = params.optiontype === "CE"; // Check if optiontype is "CE"
+    const isCDS = scrip.exch_seg === "CDS";
+
     return Object.keys(params).every((key) => {
       if (params[key] === "" || !params[key]) {
         return true; // If the parameter value is empty, skip this check
       }
+      if (key === "optiontype") {
+        return (
+          (isCE && scrip.symbol.endsWith("CE")) ||
+          (!isCE && scrip.symbol.endsWith("PE"))
+        );
+      }
+      if (key === "strike") {
+        const paramStrike = params[key];
+        const scripStrike = isCDS ? scrip.strike / 1000 : scrip.strike / 100;
+
+        return scripStrike === Number(paramStrike);
+      }
       return scrip[key] === params[key];
     });
   });
-
   const al = instrumentdata?.length;
 
   if (!al) {
     return null;
   }
-  return instrumentdata;
+  return al === 1 ? instrumentdata[0] : instrumentdata;
 }
 
 /**
- * @param {Object} params
- * @param {string} exch_seg
- * @param {string} name
- * @param {string} instrumenttype
+ *
+ * @param {{exch_seg : "NFO"|"MCX"|"CDS",name:"",name:"",instrumenttype : "OPTIDX"|"OPTSTX"|"FUTOPT"}} params
+ * @returns {Array} ExpiryDates
  */
 function GetExpiryDates(params) {
   const filedata = loadFileData();
@@ -134,22 +146,19 @@ async function CheckInstruments() {
 
 /**
  *
- * @param {Number} price
- * @param {String} name
- * @param {String} expiry
- * @param {String} instrumenttype
- * @param {String} optiontype
- * @param {Number} maxStrikes
- * @returns {atmStrike,downStrikes[],upStrikes[]}
+ * @param {{price : 0,name:"",expiry:"",instrumenttype : "OPTIDX"|"OPTSTX"|"FUTOPT",maxStrikes:5}} params
+ * @returns {{atmStrike:"",upStrikes:[],downStrikes:[]}}
  */
-function GetOptionStrikes(
-  price = 0,
-  name = "",
-  expiry = "",
-  instrumenttype = "",
-  maxStrikes = 5 // Maximum number of strikes to return for ITM and OTM
-) {
+function GetOptionStrikes(params) {
   try {
+    const {
+      price = 0,
+      name = "",
+      expiry = "",
+      instrumenttype = "",
+      maxStrikes = 5,
+    } = params; // Maximum number of strikes to return for ITM and OTM}
+
     if (!price || !name || !expiry || !instrumenttype) {
       throw new Error("inputs mising");
     }
@@ -209,6 +218,7 @@ const SmartapiInstruments = {
   FindInstrument,
   GetExpiryDates,
   GetOptionStrikes,
+  loadFileData,
 };
 
 export default SmartapiInstruments;
