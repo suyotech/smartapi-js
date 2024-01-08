@@ -74,15 +74,15 @@ async function FindInstrument(params) {
 function GetExpiryDates(params) {
   const filedata = loadFileData();
 
-  if(!filedata){
+  if (!filedata) {
     console.log("file data null");
-    return null
+    return null;
   }
-  if(!params?.exch_seg || !params?.name || !params?.instrumenttype){
+  if (!params?.exch_seg || !params?.name || !params?.instrumenttype) {
     console.log("instrumenttype or name or exch_seg missing");
-    return null
+    return null;
   }
-  
+
   const filteredData = filedata.filter((item) => {
     return (
       item.exch_seg === params.exch_seg &&
@@ -106,9 +106,9 @@ function FileOldOrNotExits(filePath) {
     const stats = fs.statSync(filePath);
     const modifiedTime = stats.mtime;
     const checkTime = new Date();
-    console.log('checktime',checkTime);
+    console.log("checktime", checkTime);
     checkTime.setHours(8, 30, 0, 0);
-    console.log(modifiedTime.toLocaleString(),checkTime.toLocaleString());
+    console.log(modifiedTime.toLocaleString(), checkTime.toLocaleString());
     return modifiedTime < checkTime;
   } catch (error) {
     if (error.code === "ENOENT") {
@@ -132,24 +132,113 @@ async function CheckInstruments() {
   }
 }
 
-function FindNearestStrike(price = 0, name = "", expiry = "",instrumenttype="",optiontype="") {
-    try{
-      const filedata = loadFileData();
+// function FindNearestStrike(
+//   price = 0,
+//   name = "",
+//   expiry = "",
+//   instrumenttype = "",
+//   optiontype = ""
+// ) {
+//   try {
+//     const filedata = loadFileData();
 
-      //Rounding price to nearest strike
-      filedata.filter(inst=>{
-        return 
-      })
-    }catch(error){
-      console.log(error.message);
-    }
+//     //Rounding price to nearest strike
+//     const symbs = filedata
+//       .filter((inst) => {
+//         return (
+//           inst.name === name &&
+//           inst.expiry === expiry &&
+//           inst.instrumenttype == instrumenttype &&
+//           inst.symbol.endsWith("CE")
+//         );
+//       })
+//       .map((inst) => ({
+//         strike: inst.strike,
+//         diff: Math.abs(inst.strike - price * 100),
+//       }))
+//       .sort((a, b) => a.diff - b.diff);
+
+//     return Array.isArray(symbs) ? symbs[0].strike / 100 : null;
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+// }
+
+/**
+ *
+ * @param {Number} price
+ * @param {String} name
+ * @param {String} expiry
+ * @param {String} instrumenttype
+ * @param {String} optiontype
+ * @param {Number} maxStrikes
+ * @returns {atmStrike,downStrikes[],upStrikes[]}
+ */
+function GetOptionStrikes(
+  price = 0,
+  name = "",
+  expiry = "",
+  instrumenttype = "",
+  optiontype = "",
+  maxStrikes = 5 // Maximum number of strikes to return for ITM and OTM
+) {
+  try {
+    const filedata = loadFileData();
+
+    // Filter strikes based on parameters and option type
+    const filteredStrikes = filedata.filter((inst) => {
+      return (
+        inst.name === name &&
+        inst.expiry === expiry &&
+        inst.instrumenttype === instrumenttype &&
+        inst.symbol.endsWith(optiontype)
+      );
+    });
+
+    // Calculate ATM, ITM, and OTM strikes
+    const sortedStrikes = filteredStrikes
+      .map((inst) => ({
+        strike: inst.strike,
+        diff: Math.abs(inst.strike - price * 100),
+      }))
+      .sort((a, b) => a.diff - b.diff);
+
+    const atmStrike = sortedStrikes
+      .slice(0, 1)
+      .map((item) => item.strike / 100)[0]; // ATM strike
+
+    const downStrikes = sortedStrikes
+      .filter(
+        (item) =>
+          item.strike < price * 100 &&
+          item.strike !== atmStrike * 100 &&
+          item.strike < atmStrike * 100
+      )
+      .slice(0, maxStrikes)
+      .map((item) => item.strike / 100); // ITM strikes
+
+    const upStrikes = sortedStrikes
+      .filter(
+        (item) =>
+          item.strike > price * 100 &&
+          item.strike !== atmStrike * 100 &&
+          item.strike > atmStrike * 100
+      )
+      .slice(0, maxStrikes)
+      .map((item) => item.strike / 100); // OTM strikes
+
+    return { atmStrike, downStrikes, upStrikes };
+  } catch (error) {
+    console.log(error.message);
+    return null;
+  }
 }
 
 const SmartapiInstruments = {
   CheckInstruments,
   FindInstrument,
   GetExpiryDates,
-  FindNearestStrike
+  GetOptionStrikes,
 };
 
 export default SmartapiInstruments;
