@@ -1,12 +1,12 @@
 import WebSocket from "ws";
-import { EventEmitter } from "events";;
+import { EventEmitter } from "events";
 /**
  * @params apikey
  * @params jwtToken
  * @params feedToken
  * @params clientCode
  */
-class SmartApiWS20 extends EventEmitter{
+class SmartApiWS20 extends EventEmitter {
   constructor(apikey, jwtToken, feedToken, clientCode) {
     super();
     this.apikey = apikey;
@@ -18,12 +18,10 @@ class SmartApiWS20 extends EventEmitter{
     this.maxReconnectAttempts = 300;
     this.heartInterval = 30000;
     this.heartBeatTimer = null;
-    this.subInstruments = new Set;
+    this.subInstruments = new Set();
     this.initPromise = this.connect();
-    
   }
 
-  
   async connect() {
     this.socket = new WebSocket(
       "wss://smartapisocket.angelone.in/smart-stream",
@@ -41,14 +39,15 @@ class SmartApiWS20 extends EventEmitter{
       console.log("Websocket connection successfull");
       this.setupHeartBeat();
       this.reconnectAttempts = 0;
-      const subtokens = Array.from(this.subInstruments)
-      this.subscribe(subtokens)
+      const subtokens = Array.from(this.subInstruments);
+      if (subUnsubTokens.length > 0) {
+        this.subscribe(subtokens);
+      }
     };
 
     this.socket.onmessage = (event) => {
       const data = parseWSData(event.data);
-      this.emit(data.token,data);
-      //console.log("Message Recived : ", data);
+      this.emit("data", data);
     };
 
     this.socket.onclose = (event) => {
@@ -64,7 +63,7 @@ class SmartApiWS20 extends EventEmitter{
     };
   }
 
-  async connectPromise(){
+  async connectPromise() {
     return this.initPromise;
   }
 
@@ -108,29 +107,28 @@ class SmartApiWS20 extends EventEmitter{
     }
   }
 
- async subscribe(instruments=[]){
-  await this.initPromise;
-    instruments.forEach(i=>this.subInstruments.add(i))
-    const tokens =  subUnsubTokens(1,wsModes.SnapQuote,instruments);
+  async subscribe(instruments = []) {
     await this.initPromise;
-    this.send(tokens)
-    console.log('Token Subscribed');
+    instruments.forEach((i) => this.subInstruments.add(i));
+    const tokens = subUnsubTokens(1, wsModes.SnapQuote, instruments);
+    await this.initPromise;
+    this.send(tokens);
+    console.log("Token Subscribed");
   }
 
-  async unsubscribe(instruments=[]){
+  async unsubscribe(instruments = []) {
     await this.initPromise;
-    const deltokens = instruments.map(d=>d.token)
-    this.subInstruments.forEach(d=>{
-      if(deltokens.includes(d.token)){
-        this.subInstruments.delete(d)
+    const deltokens = instruments.map((d) => d.token);
+    this.subInstruments.forEach((d) => {
+      if (deltokens.includes(d.token)) {
+        this.subInstruments.delete(d);
       }
-    })
-    const tokens =  subUnsubTokens(0,wsModes.SnapQuote,instruments);
+    });
+    const tokens = subUnsubTokens(0, wsModes.SnapQuote, instruments);
     await this.initPromise;
-    this.send(tokens)
-    console.log('Token Unsubscribed');
+    this.send(tokens);
+    console.log("Token Unsubscribed");
   }
-
 }
 
 const wsExchangeType = {
