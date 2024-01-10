@@ -4,13 +4,17 @@ import axios from "axios";
 const filepath = "./instrumentslist.json";
 
 function loadFileData() {
-  const filedata = JSON.parse(fs.readFileSync(filepath));
+  try {
+    const filedata = JSON.parse(fs.readFileSync(filepath));
 
-  if (!Array.isArray(filedata)) {
-    throw new Error("error reading file");
+    if (!Array.isArray(filedata)) {
+      throw new Error("error reading file");
+    }
+
+    return filedata;
+  } catch (error) {
+    console.log("error loading data ", error);
   }
-
-  return filedata;
 }
 async function DownloadInstruments() {
   try {
@@ -41,8 +45,7 @@ async function DownloadInstruments() {
 
 /**
  *
- * @param {{exch_seg :"NSE"|"BSE"|"NFO"|"MCX"|"CDS"|"NCDEX",name:"BANKNIFTY",instrumenttype : ""|"FUTIDX"|"OPTIDX"|"FUTSTK"|"OPTSTK"|"FUTCOM"|"FUTOPT",expiry:"11JAN2024",strike:21000,optiontype:"CE"|"PE"}} params
- * @returns {Array|Object} instruments
+
  */
 async function FindInstrument(params) {
   const filedata = loadFileData();
@@ -218,7 +221,6 @@ const SmartapiInstruments = {
   FindInstrument,
   GetExpiryDates,
   GetOptionStrikes,
-  loadFileData,
 };
 
 export default SmartapiInstruments;
