@@ -14,6 +14,7 @@ class SmartApiWS20 extends EventEmitter {
     this.feedToken = feedToken;
     this.clientCode = clientCode;
     this.socket = null;
+    this.reconnecting = false;
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 300;
     this.heartInterval = 30000;
@@ -39,27 +40,42 @@ class SmartApiWS20 extends EventEmitter {
       console.log("Websocket connection successfull");
       this.setupHeartBeat();
       this.reconnectAttempts = 0;
-      const subtokens = Array.from(this.subInstruments);
-      if (subUnsubTokens.length > 0) {
-        this.subscribe(subtokens);
+      this.reconnecting = false;
+      if (this.socket.readyState === WebSocket.OPEN) {
+        console.log("if previous intrument subscribed");
+
+        const subtokens = Array.from(this.subInstruments);
+        if (subtokens.length > 0) {
+          this.subscribe(subtokens);
+        } else {
+          console.log("no instrument found");
+        }
       }
     };
 
     this.socket.onmessage = (event) => {
       const data = parseWSData(event.data);
-      this.emit("data", data);
+      if (typeof data === "object") {
+        this.emit("data", data);
+      } else {
+        console.log("message reviced", data);
+      }
     };
 
     this.socket.onclose = (event) => {
       console.log("Websocket Connection Closed ");
-      this.cleanup();
-      this.reconnect();
+      if (!this.reconnecting) {
+        this.cleanup();
+        this.reconnect();
+      }
     };
 
     this.socket.onerror = (error) => {
-      console.log("Websocket error ", error?.message);
-      // this.cleanup();
-      // this.reconnect();
+      console.log("Websocket error ", error.message, error.target);
+      if (!this.reconnecting) {
+        this.cleanup();
+        this.reconnect();
+      }
     };
   }
 
@@ -80,6 +96,7 @@ class SmartApiWS20 extends EventEmitter {
   }
 
   reconnect() {
+    this.reconnecting = true;
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       const delay = Math.pow(2, this.reconnectAttempts) * 1000; // Exponential delay in milliseconds
       console.log(
@@ -97,13 +114,25 @@ class SmartApiWS20 extends EventEmitter {
   }
 
   send(message) {
-    if (this.socket.readyState == WebSocket.CLOSED) {
+    const maxAttempts = 10;
+    let attempts = 0;
+
+    const trySending = () => {
+      if (this.socket.readyState === WebSocket.OPEN) {
+        this.socket.send(JSON.stringify(message));
+      } else if (attempts < maxAttempts) {
+        attempts++;
+        setTimeout(trySending, 500);
+      } else {
+        console.error("Unable to send message after 10 attempts.");
+      }
+    };
+
+    if (this.socket.readyState === WebSocket.CLOSED) {
       this.connect();
-    } else if (this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify(message));
+      setTimeout(trySending, 500); // Wait for the socket to connect before sending.
     } else {
-      console.error("Websocket is not open");
-      this.socket.terminate();
+      trySending();
     }
   }
 
