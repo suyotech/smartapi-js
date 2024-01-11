@@ -71,7 +71,7 @@ class SmartApiWS20 extends EventEmitter {
     };
 
     this.socket.onerror = (error) => {
-      console.log("Websocket error ", error.message, error.target);
+      console.log("Websocket error ", error.message);
       if (!this.reconnecting) {
         this.cleanup();
         this.reconnect();
