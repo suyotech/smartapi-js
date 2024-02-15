@@ -2,7 +2,6 @@ import axios from "axios";
 import os from "os";
 import totp from "totp-generator";
 
-
 class SmartApi {
   constructor(clientID, mpin, apiKey, totpKey) {
     this.clientID = clientID;
@@ -19,64 +18,64 @@ class SmartApi {
     this.httpClient = null;
     this.debug = false;
     this.InitPromise = this.init();
-    this.socket = null
+    this.socket = null;
   }
 
   async init() {
- try {
-  this.localIP = getLocalIP();
-  this.macAddress = getMAC();
+    try {
+      this.localIP = getLocalIP();
+      this.macAddress = getMAC();
 
-  const publicIP = await getPublicIP();
-  this.publicIP = publicIP;
+      const publicIP = await getPublicIP();
+      this.publicIP = publicIP;
 
-  this.httpClient = axios.create({
-    baseURL: routes.burl,
-    timeout: this.timeout,
-    headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      "X-User-Type": "USER",
-      "X-SourceID": "WEB",
-      "X-ClientLocalIP": this.localIP,
-      "X-ClientPublicIP": this.publicIP,
-      "X-MACAddress": this.macAddress,
-      "X-PrivateKey": this.apiKey,
-      Authorization: `Bearer ${this.jwtToken}`,
-    },
-  });
+      this.httpClient = axios.create({
+        baseURL: routes.burl,
+        timeout: this.timeout,
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          "X-User-Type": "USER",
+          "X-SourceID": "WEB",
+          "X-ClientLocalIP": this.localIP,
+          "X-ClientPublicIP": this.publicIP,
+          "X-MACAddress": this.macAddress,
+          "X-PrivateKey": this.apiKey,
+          Authorization: `Bearer ${this.jwtToken}`,
+        },
+      });
 
-  this.httpClient.interceptors.response.use(
-    (response) => {
-      if(!response.data.status){
-        console.log('error',response.data.message);
-        return null
-      }
-      return response.data.data;
-    },
-    (error) => {
-      if (error.resquest) {
-        console.log("request error ", error);
-      } else if (error.response) {
-        console.log(
-          "response error ",
-          this.debug ? error : error.response.data
-        );
-      } else {
-        console.log("error ", this.debug ? error : error.message);
-      }
+      this.httpClient.interceptors.response.use(
+        (response) => {
+          if (!response.data.status) {
+            console.log("error", response.data.message);
+            return null;
+          }
+          return response.data.data;
+        },
+        (error) => {
+          if (error.resquest) {
+            console.log("request error ", error);
+          } else if (error.response) {
+            console.log("response error ", this.debug ? error : error.response.data);
+          } else {
+            console.log("error ", this.debug ? error : error.message);
+          }
+        }
+      );
+
+      this.httpClient.interceptors.request.use(
+        (config) => {
+          return config;
+        },
+        (error) => {
+          console.log("request error ", error);
+          return Promise.reject(error);
+        }
+      );
+    } catch (error) {
+      console.log("init error", error);
     }
-  );
-
-  this.httpClient.interceptors.request.use(config=>{
-    return config;
-  },error=>{
-    console.log('request error ',error)
-    return Promise.reject(error);
-  })
- } catch (error) {
-    console.log("init error",error);
- }
   }
 
   async InitDone() {
@@ -112,12 +111,11 @@ class SmartApi {
     return await this.httpClient.get(routes.profileUrl);
   }
 
-
   /**
    * Place Order Buy Sell
    * @method
    * @async
-   * @param  params params required for fetching candle data
+   * @param params params required for fetching candle data
    * @param params.variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
    * @param params.tradingsymbol  Tradingsymbol of instrument
    * @param params.symboltoken Token of instrument
@@ -168,12 +166,11 @@ class SmartApi {
    * @returns
    */
   async cancelOrder(params) {
-  
     return await this.httpClient.post(routes.cancelOrderUrl, params);
   }
 
   /**
-   * @method 
+   * @method
    * @async
    * @returns {Array} of ordebook
    */
@@ -183,23 +180,21 @@ class SmartApi {
     return data;
   }
 
-  async getTradeBook(){
+  async getTradeBook() {
     const data = await this.httpClient.get(routes.tradeBookUrl);
     return data;
   }
 
-  async getMarketData(mode="LTP",instrumentlist = []) {
-    
-    if(!Array.isArray(instrumentlist) || !mode){
-      console.log('instrument list null or mode is not defined');
+  async getMarketData(mode = "LTP", instrumentlist = []) {
+    if (!Array.isArray(instrumentlist) || !mode) {
+      console.log("instrument list null or mode is not defined");
       return null;
     }
 
-    const params = ArrayInstToMarketDataParams(mode,instrumentlist);
+    const params = ArrayInstToMarketDataParams(mode, instrumentlist);
     const data = await this.httpClient.post(routes.marketDataUrl, params);
     return data;
   }
-
 
   /**
    *
@@ -212,75 +207,67 @@ class SmartApi {
    * @returns Array of [[datetime,o,h,l,c,v]....]
    */
   async getCandleData(params) {
-    if (
-      !params.exchange ||
-      !params.symboltoken ||
-      !params.interval ||
-      !params.fromdate ||
-      !params.todate
-    ) {
+    if (!params.exchange || !params.symboltoken || !params.interval || !params.fromdate || !params.todate) {
       throw new Error("some params missing");
     }
     const data = await this.httpClient.post(routes.candleDataUrl, params);
     return data;
   }
 
+  //Constants
 
-//Constants
+  exchange = {
+    BSE: "BSE",
+    NSE: "NSE",
+    NFO: "NFO",
+    MCX: "MCX",
+    CDS: "CDS",
+  };
 
+  orderDuration = {
+    DAY: "DAY",
+    IOC: "IOC",
+  };
 
- exchange = {
-  BSE: "BSE",
-  NSE: "NSE",
-  NFO: "NFO",
-  MCX: "MCX",
-  CDS: "CDS",
-};
+  producttype = {
+    DELIVERY: "DELIVERY",
+    CARRYFORWARD: "CARRYFORWARD",
+    MARGIN: "MARGIN",
+    INTRADAY: "INTRADAY",
+    BO: "BO",
+  };
 
- orderDuration = {
-  DAY: "DAY",
-  IOC: "IOC",
-};
+  ordertype = {
+    MARKET: "MARKET",
+    LIMIT: "LIMIT",
+    STOPLOSS_LIMIT: "STOPLOSS_LIMIT",
+    STOPLOSS_MARKET: "STOPLOSS_MARKET",
+  };
 
- producttype = {
-  DELIVERY: "DELIVERY",
-  CARRYFORWARD: "CARRYFORWARD",
-  MARGIN: "MARGIN",
-  INTRADAY: "INTRADAY",
-  BO: "BO",
-};
+  transactiontype = {
+    BUY: "BUY",
+    SELL: "SELL",
+    SHORT: "SELL",
+    COVER: "BUY",
+  };
 
- ordertype = {
-  MARKET: "MARKET",
-  LIMIT: "LIMIT",
-  STOPLOSS_LIMIT: "STOPLOSS_LIMIT",
-  STOPLOSS_MARKET: "STOPLOSS_MARKET",
-};
+  variety = {
+    NORMAL: "NORMAL",
+    STOPLOSS: "STOPLOSS",
+    AMO: "AMO",
+    ROBO: "ROBO",
+  };
 
- transactiontype = {
-  BUY: "BUY",
-  SELL: "SELL",
-  SHORT: "SELL",
-  COVER: "BUY",
-};
-
- variety = {
-  NORMAL: "NORMAL",
-  STOPLOSS: "STOPLOSS",
-  AMO: "AMO",
-  ROBO: "ROBO",
-};
-
- timeframe = {
-  ONE_MINUTE: "ONE_MINUTE",
-  THREE_MINUTE: "THREE_MINUTE",
-  FIVE_MINUTE: "FIVE_MINUTE",
-  TEN_MINUTE: "TEN_MINUTE",
-  FIFTEEN_MINUTE: "FIFTEEN_MINUTE",
-  THIRTY_MINUTE: "THIRTY_MINUTE",
-  ONE_HOUR: "ONE_HOUR",
-  ONE_DAY: "ONE_DAY",
-};
+  timeframe = {
+    ONE_MINUTE: "ONE_MINUTE",
+    THREE_MINUTE: "THREE_MINUTE",
+    FIVE_MINUTE: "FIVE_MINUTE",
+    TEN_MINUTE: "TEN_MINUTE",
+    FIFTEEN_MINUTE: "FIFTEEN_MINUTE",
+    THIRTY_MINUTE: "THIRTY_MINUTE",
+    ONE_HOUR: "ONE_HOUR",
+    ONE_DAY: "ONE_DAY",
+  };
 }
 //utils functions
 
@@ -292,22 +279,20 @@ const routes = {
   modifyOrderUrl: "/rest/secure/angelbroking/order/v1/modifyOrder",
   cancelOrderUrl: "/rest/secure/angelbroking/order/v1/cancelOrder",
   orderBookUrl: "/rest/secure/angelbroking/order/v1/getOrderBook",
-  tradeBookUrl:"/rest/secure/angelbroking/order/v1/getTradeBook",
+  tradeBookUrl: "/rest/secure/angelbroking/order/v1/getTradeBook",
   marketDataUrl: "/rest/secure/angelbroking/market/v1/quote/",
   candleDataUrl: "/rest/secure/angelbroking/historical/v1/getCandleData",
 };
 
 function getLocalIP() {
   const interfaces = os.networkInterfaces();
-  let localIP = '';
+  let localIP = "";
 
   // Loop through network interfaces
   Object.keys(interfaces).forEach((interfaceName) => {
     const interfaceInfo = interfaces[interfaceName];
     // Find an IPv4 address that is not internal or loopback
-    const activeInterface = interfaceInfo.find(
-      (info) => !info.internal && info.family === 'IPv4'
-    );
+    const activeInterface = interfaceInfo.find((info) => !info.internal && info.family === "IPv4");
 
     if (activeInterface) {
       localIP = activeInterface.address;
@@ -320,13 +305,13 @@ function getLocalIP() {
 // Function to get the MAC address
 function getMAC() {
   const networkInterfaces = os.networkInterfaces();
-  let macAddress = '';
+  let macAddress = "";
 
   // Loop through network interfaces to find the MAC address
   Object.keys(networkInterfaces).forEach((interfaceName) => {
     const interfaceInfo = networkInterfaces[interfaceName];
 
-    const mac = interfaceInfo.find((details) => details.mac && details.mac !== '00:00:00:00:00:00');
+    const mac = interfaceInfo.find((details) => details.mac && details.mac !== "00:00:00:00:00:00");
 
     if (mac) {
       macAddress = mac.mac;
@@ -346,11 +331,10 @@ const getPublicIP = async () => {
   }
 };
 
-
 /**
- * 
- * @param {String} mode LTP,OHLC,FULL 
- * @param {Array} instruments Array of Instruments 
+ *
+ * @param {String} mode LTP,OHLC,FULL
+ * @param {Array} instruments Array of Instruments
  * @returns MarketData Params
  */
 

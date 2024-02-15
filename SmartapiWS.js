@@ -24,17 +24,14 @@ class SmartApiWS20 extends EventEmitter {
   }
 
   async connect() {
-    this.socket = new WebSocket(
-      "wss://smartapisocket.angelone.in/smart-stream",
-      {
-        headers: {
-          Authorization: this.jwtToken,
-          "x-api-key": this.apikey,
-          "x-client-code": this.clientCode,
-          "x-feed-token": this.feedToken,
-        },
-      }
-    );
+    this.socket = new WebSocket("wss://smartapisocket.angelone.in/smart-stream", {
+      headers: {
+        Authorization: this.jwtToken,
+        "x-api-key": this.apikey,
+        "x-client-code": this.clientCode,
+        "x-feed-token": this.feedToken,
+      },
+    });
 
     this.socket.onopen = () => {
       console.log("Websocket connection successfull");
@@ -99,11 +96,7 @@ class SmartApiWS20 extends EventEmitter {
     this.reconnecting = true;
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       const delay = Math.pow(2, this.reconnectAttempts) * 1000; // Exponential delay in milliseconds
-      console.log(
-        `Attempting to reconnect in ${delay / 1000} seconds... Attemp count ${
-          this.reconnectAttempts
-        }`
-      );
+      console.log(`Attempting to reconnect in ${delay / 1000} seconds... Attemp count ${this.reconnectAttempts}`);
       setTimeout(() => {
         this.connect();
         this.reconnectAttempts++;
@@ -221,10 +214,7 @@ function parseWSData(data) {
 
       const best5data = buffer.slice(147, 347);
       for (let i = 0; i < packetno; i++) {
-        const packet = best5data.slice(
-          packetsize * i,
-          packetsize * i + packetsize
-        );
+        const packet = best5data.slice(packetsize * i, packetsize * i + packetsize);
         const name = `b5${i > 4 ? "s" : "b"}${i > 4 ? i - 4 : i + 1}`;
         const data5 = {
           q: packet.readUIntLE(2, 6),
