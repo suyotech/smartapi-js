@@ -21,6 +21,7 @@ class SmartApiWS20 extends EventEmitter {
     this.heartBeatTimer = null;
     this.subInstruments = new Set();
     this.initPromise = this.connect();
+    this.terminate_socket = false;
   }
 
   async connect() {
@@ -34,6 +35,7 @@ class SmartApiWS20 extends EventEmitter {
     });
 
     this.socket.onopen = () => {
+      this.terminate_socket = false;
       console.log("Websocket connection successfull");
       this.setupHeartBeat();
       this.reconnectAttempts = 0;
@@ -62,6 +64,10 @@ class SmartApiWS20 extends EventEmitter {
     this.socket.onclose = (event) => {
       console.log("Websocket Connection Closed ");
       if (!this.reconnecting) {
+        if (this.terminate_socket) {
+          console.log("connection terminated");
+          return;
+        }
         this.cleanup();
         this.reconnect();
       }
@@ -104,6 +110,12 @@ class SmartApiWS20 extends EventEmitter {
     } else {
       console.error("Maximum reconnection attempts reached.");
     }
+  }
+
+  terminate() {
+    this.terminate_socket = true;
+    this.socket.close();
+    console.log("socket terminated");
   }
 
   send(message) {

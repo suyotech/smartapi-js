@@ -115,8 +115,8 @@ class SmartApi {
    * Place Order Buy Sell
    * @method
    * @async
-   * @param params params required for fetching candle data
-   * @param params.variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
+   * @param Object params required for fetching candle data
+   * @param String params.variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
    * @param params.tradingsymbol  Tradingsymbol of instrument
    * @param params.symboltoken Token of instrument
    * @param params.exchange Exchange of instrument
