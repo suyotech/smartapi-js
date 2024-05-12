@@ -18,7 +18,6 @@ class SmartApi {
     this.httpClient = null;
     this.debug = false;
     this.InitPromise = this.init();
-    this.socket = null;
   }
 
   async init() {
@@ -82,14 +81,14 @@ class SmartApi {
     return this.InitPromise;
   }
 
-  setDebut(debug = false) {
+  /**
+   *
+   * @param {true | false} debug
+   */
+  setDebug(debug = false) {
     this.debug = debug;
   }
 
-  async print() {
-    await this.InitDone();
-    console.log("login successfull");
-  }
   async generateSession() {
     await this.InitDone();
     const data = await this.httpClient.post(routes.loginUrl, {
@@ -99,10 +98,10 @@ class SmartApi {
     });
 
     if (data) {
-      this.accessToken = data.jwtToken;
+      this.jwtToken = data.jwtToken;
       this.requestToken = data.refreshToken;
       this.feedToken = data.feedToken;
-      this.httpClient.defaults.headers.Authorization = `Bearer ${this.accessToken}`;
+      this.httpClient.defaults.headers.Authorization = `Bearer ${this.jwtToken}`;
     }
   }
 

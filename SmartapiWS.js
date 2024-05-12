@@ -122,6 +122,8 @@ class SmartApiWS20 extends EventEmitter {
     const maxAttempts = 10;
     let attempts = 0;
 
+    console.log("sending message from fucntion");
+
     const trySending = () => {
       if (this.socket.readyState === WebSocket.OPEN) {
         this.socket.send(JSON.stringify(message));

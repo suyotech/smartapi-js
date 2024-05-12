@@ -20,8 +20,7 @@ async function DownloadInstruments() {
   try {
     const startTime = performance.now();
     const writer = createWriteStream(filepath);
-    const instruments_uri =
-      "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json";
+    const instruments_uri = "https://margincalculator.angelbroking.com/OpenAPI_File/files/OpenAPIScripMaster.json";
     const resp = await axios({
       method: "get",
       url: instruments_uri,
@@ -37,6 +36,7 @@ async function DownloadInstruments() {
 
     const endTime = performance.now();
     const downloadTime = endTime - startTime;
+
     console.log(`instruments dowloaded in ${downloadTime.toFixed(2)} ms`);
   } catch (error) {
     console.log("error downloading instruments ", error.messsage);
@@ -47,7 +47,7 @@ async function DownloadInstruments() {
  *
 
  */
-async function FindInstrument(params) {
+function FindInstrument(params) {
   const filedata = loadFileData();
 
   const instrumentdata = filedata.filter((scrip) => {
@@ -59,10 +59,7 @@ async function FindInstrument(params) {
         return true; // If the parameter value is empty, skip this check
       }
       if (key === "optiontype") {
-        return (
-          (isCE && scrip.symbol.endsWith("CE")) ||
-          (!isCE && scrip.symbol.endsWith("PE"))
-        );
+        return (isCE && scrip.symbol.endsWith("CE")) || (!isCE && scrip.symbol.endsWith("PE"));
       }
       if (key === "strike") {
         const paramStrike = params[key];
@@ -124,7 +121,7 @@ function FileOldOrNotExits(filePath) {
     console.log("checktime", checkTime);
     checkTime.setHours(8, 30, 0, 0);
     console.log(modifiedTime.toLocaleString(), checkTime.toLocaleString());
-    return modifiedTime < checkTime;
+    return modifiedTime < checkTime || stats.size === 0;
   } catch (error) {
     if (error.code === "ENOENT") {
       return true; // File does not exist
@@ -154,13 +151,7 @@ async function CheckInstruments() {
  */
 function GetOptionStrikes(params) {
   try {
-    const {
-      price = 0,
-      name = "",
-      expiry = "",
-      instrumenttype = "",
-      maxStrikes = 5,
-    } = params; // Maximum number of strikes to return for ITM and OTM}
+    const { price = 0, name = "", expiry = "", instrumenttype = "", maxStrikes = 5 } = params; // Maximum number of strikes to return for ITM and OTM}
 
     if (!price || !name || !expiry || !instrumenttype) {
       throw new Error("inputs mising");
@@ -185,27 +176,15 @@ function GetOptionStrikes(params) {
       }))
       .sort((a, b) => a.diff - b.diff);
 
-    const atmStrike = sortedStrikes
-      .slice(0, 1)
-      .map((item) => item.strike / 100)[0]; // ATM strike
+    const atmStrike = sortedStrikes.slice(0, 1).map((item) => item.strike / 100)[0]; // ATM strike
 
     const downStrikes = sortedStrikes
-      .filter(
-        (item) =>
-          item.strike < price * 100 &&
-          item.strike !== atmStrike * 100 &&
-          item.strike < atmStrike * 100
-      )
+      .filter((item) => item.strike < price * 100 && item.strike !== atmStrike * 100 && item.strike < atmStrike * 100)
       .slice(0, maxStrikes)
       .map((item) => item.strike / 100); // ITM strikes
 
     const upStrikes = sortedStrikes
-      .filter(
-        (item) =>
-          item.strike > price * 100 &&
-          item.strike !== atmStrike * 100 &&
-          item.strike > atmStrike * 100
-      )
+      .filter((item) => item.strike > price * 100 && item.strike !== atmStrike * 100 && item.strike > atmStrike * 100)
       .slice(0, maxStrikes)
       .map((item) => item.strike / 100); // OTM strikes
 
