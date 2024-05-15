@@ -3,7 +3,7 @@ import axios from "axios";
 
 const filepath = "./instrumentslist.json";
 
-function loadFileData() {
+export function loadFileData() {
   try {
     const filedata = JSON.parse(fs.readFileSync(filepath));
 
@@ -47,9 +47,11 @@ async function DownloadInstruments() {
  *
 
  */
-function FindInstrument(params) {
-  const filedata = loadFileData();
-
+function FindInstrument(params, fd = null) {
+  let filedata = fd;
+  if (!fd) {
+    filedata = loadFileData();
+  }
   const instrumentdata = filedata.filter((scrip) => {
     const isCE = params.optiontype === "CE"; // Check if optiontype is "CE"
     const isCDS = scrip.exch_seg === "CDS";
@@ -200,6 +202,7 @@ const SmartapiInstruments = {
   FindInstrument,
   GetExpiryDates,
   GetOptionStrikes,
+  loadFileData,
 };
 
 export default SmartapiInstruments;
