@@ -1,6 +1,6 @@
-import { SmartApi, SmartApiWS20 } from "smartapi-js";
 import { v4 as uuidv4 } from "uuid";
 import cron from "node-cron";
+import SmartApi from "./SmartapiHttp.js";
 
 SmartApi;
 
@@ -18,10 +18,7 @@ class HistoricalDataProvider {
    * @private
    */
   #api;
-  /**
-   * @type {SmartApiWS20}
-   * @private
-   */
+
   #histque = [];
   #histSubscriptions = new Map();
   #interval = {
@@ -96,10 +93,19 @@ class HistoricalDataProvider {
    */
   async subHistData(instrument, interval, callback) {
     try {
+      if (
+        typeof instrument != "object" ||
+        Array.isArray(instrument) ||
+        typeof interval != "string" ||
+        typeof callback != "function"
+      ) {
+        throw new Error("invalid argument types");
+      }
       const callbackid = uuidv4();
       const histkey = `${instrument.token}-${interval}`;
       if (!this.#histSubscriptions.has(histkey)) {
         const cronstring = `*/${this.#interval[interval].number} * * * *`;
+        console.log("cron string", cronstring);
         const cronjob = cron.schedule(cronstring, () => {
           const d = { instrument, interval, callbacks: this.#histSubscriptions.get(histkey).callbacks };
           this.#histque.push(d);
