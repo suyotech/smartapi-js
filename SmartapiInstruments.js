@@ -149,32 +149,33 @@ async function CheckInstruments() {
 /**
  *
  * @param {{price : 0,name:"",expiry:"",instrumenttype : "OPTIDX"|"OPTSTX"|"FUTOPT",maxStrikes:5}} params
+ * @param {Array} fd data from filedata function
  * @returns {{atmStrike:"",upStrikes:[],downStrikes:[]}}
  */
-function GetOptionStrikes(params) {
+function GetOptionStrikes(params, fd) {
   try {
     const { price = 0, name = "", expiry = "", instrumenttype = "", maxStrikes = 5 } = params; // Maximum number of strikes to return for ITM and OTM}
 
     if (!price || !name || !expiry || !instrumenttype) {
       throw new Error("inputs mising");
     }
-    const filedata = loadFileData();
-    const optiontype = "CE";
+    const filedata = fd || loadFileData();
     // Filter strikes based on parameters and option type
-    const filteredStrikes = filedata.filter((inst) => {
-      return (
-        inst.name === name &&
-        inst.expiry === expiry &&
-        inst.instrumenttype === instrumenttype &&
-        inst.symbol.endsWith(optiontype)
-      );
-    });
+    const filteredStrikes = Array.from(
+      new Set(
+        filedata
+          .filter((inst) => {
+            return inst.name === name && inst.expiry === expiry && inst.instrumenttype === instrumenttype;
+          })
+          .map((i) => i.strike)
+      )
+    );
 
     // Calculate ATM, ITM, and OTM strikes
     const sortedStrikes = filteredStrikes
-      .map((inst) => ({
-        strike: inst.strike,
-        diff: Math.abs(inst.strike - price * 100),
+      .map((strike) => ({
+        strike,
+        diff: Math.abs(strike - price * 100),
       }))
       .sort((a, b) => a.diff - b.diff);
 
