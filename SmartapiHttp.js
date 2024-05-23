@@ -184,6 +184,16 @@ class SmartApi {
     return data;
   }
 
+  async getPositionBook() {
+    const data = await this.httpClient.get(routes.positionBookUrl);
+    return data;
+  }
+
+  async getHoldingAll() {
+    const data = await this.httpClient.get(routes.holdingAllBookUrl);
+    return data;
+  }
+
   async getMarketData(mode = "LTP", instrumentlist = []) {
     if (!Array.isArray(instrumentlist) || !mode) {
       console.log("instrument list null or mode is not defined");
@@ -278,6 +288,8 @@ const routes = {
   modifyOrderUrl: "/rest/secure/angelbroking/order/v1/modifyOrder",
   cancelOrderUrl: "/rest/secure/angelbroking/order/v1/cancelOrder",
   orderBookUrl: "/rest/secure/angelbroking/order/v1/getOrderBook",
+  positionBookUrl: "/rest/secure/angelbroking/order/v1/getPosition",
+  holdingAllBookUrl: "/rest/secure/angelbroking/order/v1/getAllHolding",
   tradeBookUrl: "/rest/secure/angelbroking/order/v1/getTradeBook",
   marketDataUrl: "/rest/secure/angelbroking/market/v1/quote/",
   candleDataUrl: "/rest/secure/angelbroking/historical/v1/getCandleData",
