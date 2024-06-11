@@ -122,7 +122,7 @@ class SmartApiWS20 extends EventEmitter {
     const maxAttempts = 10;
     let attempts = 0;
 
-    console.log("sending message from fucntion");
+    // console.log("sending message from fucntion");
 
     const trySending = () => {
       if (this.socket.readyState === WebSocket.OPEN) {
@@ -144,6 +144,10 @@ class SmartApiWS20 extends EventEmitter {
   }
 
   async subscribe(instruments = []) {
+    if (instruments.length === 0) {
+      console.log("no instrument to subscribe");
+      return;
+    }
     await this.initPromise;
     instruments.forEach((i) => this.subInstruments.add(i));
     const tokens = subUnsubTokens(1, wsModes.SnapQuote, instruments);
