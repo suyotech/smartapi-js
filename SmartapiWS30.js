@@ -76,7 +76,7 @@ class SmartapiWS30 {
             obj.callback({ ...subs.instrument, ...data });
           });
         } else {
-          console.log("message reviced", data);
+          // console.log("message reviced", data);
         }
       };
 

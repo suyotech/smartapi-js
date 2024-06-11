@@ -57,7 +57,7 @@ class SmartApiWS20 extends EventEmitter {
       if (typeof data === "object") {
         this.emit("data", data);
       } else {
-        console.log("message reviced", data);
+        this.emit("text", data);
       }
     };
 
@@ -89,7 +89,7 @@ class SmartApiWS20 extends EventEmitter {
   setupHeartBeat() {
     this.heartBeatTimer = setInterval(() => {
       this.socket.send("ping");
-      console.log("sent ping ");
+      // console.log("sent ping ");
     }, this.heartInterval);
   }
 
