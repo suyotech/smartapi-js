@@ -85,8 +85,11 @@ function FindInstrument(params, fd = null) {
  * @param {{exch_seg : "NFO"|"MCX"|"CDS",name:"",name:"",instrumenttype : "OPTIDX"|"OPTSTX"|"FUTOPT"}} params
  * @returns {Array} ExpiryDates
  */
-function GetExpiryDates(params) {
-  const filedata = loadFileData();
+function GetExpiryDates(params, fd) {
+  let filedata = fd;
+  if (!fd) {
+    filedata = loadFileData();
+  }
 
   if (!filedata) {
     console.log("file data null");
