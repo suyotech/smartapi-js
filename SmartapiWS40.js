@@ -77,7 +77,7 @@ class SmartapiWS40 {
 
     this.#ws.on("message", (data, isBinary) => {
       if (!isBinary) {
-        console.log("message recieved", this.#name, data.toString(), isBinary);
+        // console.log("message recieved", this.#name, data.toString(), isBinary);
       } else {
         if (this.#onData) {
           this.#onData(this.#parseWSData(data));
@@ -153,6 +153,11 @@ class SmartapiWS40 {
 
     this.#onData = cb;
   }
+
+  readyState() {
+    return this.#ws.readyState === WebSocket.OPEN;
+  }
+
   #subtokens(instruments = []) {
     if (
       this.#ws &&
