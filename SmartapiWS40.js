@@ -88,7 +88,7 @@ class SmartapiWS40 {
 
   readyState() {
     if (this.#ws) {
-      return this.#ws.readyState() === WebSocket.OPEN;
+      return this.#ws.readyState === WebSocket.OPEN;
     } else {
       return false;
     }
