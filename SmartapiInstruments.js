@@ -64,6 +64,12 @@ function FindInstrument(params, fd = null) {
     const isCE = params.optiontype === "CE"; // Check if optiontype is "CE"
     const isCDS = scrip.exch_seg === "CDS";
 
+    const tkswrong = scrip.token.split(" ");
+
+    if (tkswrong.length !== 1) {
+      return false;
+    }
+
     return Object.keys(params).every((key) => {
       if (params[key] === "" || !params[key]) {
         return true; // If the parameter value is empty, skip this check

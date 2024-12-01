@@ -56,7 +56,10 @@ class SmartApi {
           if (error.resquest) {
             console.log("request error ", error);
           } else if (error.response) {
-            console.log("response error ", this.debug ? error : error.response.data);
+            console.log(
+              "response error ",
+              this.debug ? error : error.response.data
+            );
           } else {
             console.log("error ", this.debug ? error : error.message);
           }
@@ -216,7 +219,13 @@ class SmartApi {
    * @returns Array of [[datetime,o,h,l,c,v]....]
    */
   async getCandleData(params) {
-    if (!params.exchange || !params.symboltoken || !params.interval || !params.fromdate || !params.todate) {
+    if (
+      !params.exchange ||
+      !params.symboltoken ||
+      !params.interval ||
+      !params.fromdate ||
+      !params.todate
+    ) {
       throw new Error("some params missing");
     }
     const data = await this.httpClient.post(routes.candleDataUrl, params);
@@ -281,7 +290,7 @@ class SmartApi {
 //utils functions
 
 const routes = {
-  burl: "https://apiconnect.angelbroking.com",
+  burl: "https://apiconnect.angelone.in",
   loginUrl: "/rest/auth/angelbroking/user/v1/loginByPassword",
   profileUrl: "/rest/secure/angelbroking/user/v1/getProfile",
   placeOrderUrl: "/rest/secure/angelbroking/order/v1/placeOrder",
@@ -303,7 +312,9 @@ function getLocalIP() {
   Object.keys(interfaces).forEach((interfaceName) => {
     const interfaceInfo = interfaces[interfaceName];
     // Find an IPv4 address that is not internal or loopback
-    const activeInterface = interfaceInfo.find((info) => !info.internal && info.family === "IPv4");
+    const activeInterface = interfaceInfo.find(
+      (info) => !info.internal && info.family === "IPv4"
+    );
 
     if (activeInterface) {
       localIP = activeInterface.address;
@@ -322,7 +333,9 @@ function getMAC() {
   Object.keys(networkInterfaces).forEach((interfaceName) => {
     const interfaceInfo = networkInterfaces[interfaceName];
 
-    const mac = interfaceInfo.find((details) => details.mac && details.mac !== "00:00:00:00:00:00");
+    const mac = interfaceInfo.find(
+      (details) => details.mac && details.mac !== "00:00:00:00:00:00"
+    );
 
     if (mac) {
       macAddress = mac.mac;

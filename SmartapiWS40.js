@@ -77,7 +77,7 @@ class SmartapiWS40 {
 
     this.#ws.on("message", (data, isBinary) => {
       if (!isBinary) {
-        console.log("message recieved", this.#name, data.toString(), isBinary);
+        // console.log("message recieved", this.#name, data.toString(), isBinary);
       } else {
         if (this.#onData) {
           this.#onData(this.#parseWSData(data));
@@ -167,7 +167,7 @@ class SmartapiWS40 {
       this.#ws.readyState === WebSocket.OPEN &&
       instruments.length > 0
     ) {
-      console.log("sending tokens", this.#name, instruments.length);
+      // console.log("sending tokens", this.#name, instruments.length);
       const tokens = this.#convertTokens("subscribe", "SnapQuote", instruments);
       this.#ws.send(JSON.stringify(tokens));
     }
