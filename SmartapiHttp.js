@@ -392,7 +392,7 @@ export default SmartApi;
  * @typedef {Object} orderParams
  * @property {string} tradingsymbol - Trading Symbol of the instrument.
  * @property {string} symboltoken - Symbol Token is a unique identifier.
- * @property {string} Exchange - Name of the exchange.
+ * @property {string} exchange - Name of the exchange.
  * @property {string} transactiontype - BUY or SELL.
  * @property {string} ordertype - Order type (e.g., MARKET, LIMIT).
  * @property {number} quantity - Quantity to transact.
