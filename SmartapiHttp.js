@@ -114,26 +114,8 @@ class SmartApi {
   }
 
   /**
-   * Place Order Buy Sell
-   * @method
-   * @async
-   * @param Object params required for fetching candle data
-   * @param String params.variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
-   * @param params.tradingsymbol  Tradingsymbol of instrument
-   * @param params.symboltoken Token of instrument
-   * @param params.exchange Exchange of instrument
-   * @param params.transactiontype BUY or SELL
-   * @param params.ordertype Order type (MARKET, LIMIT etc.)
-   * @param params.quantity Quantity in Integer.
-   * @param params.producttype Product type (CNC,MIS, NORMAL)
-   * @param params.price The min or max price to execute the order at (for LIMIT orders)
-   * @param params.triggerprice The price at which an order should be triggered (SL, SL-M)
-   * @param params.squareoff Target Points Only For ROBO (Bracket Order)
-   * @param params.stoploss Stoploss Points Only For ROBO (Bracket Order)
-   * @param params.trailingStopLoss TSL Points  Only For ROBO (Bracket Order)
-   * @param params.disclosedquantity Quantity to disclose publicly (for equity trades)
-   * @param params.duration Order duration (DAY,IOC)
-   * @param params.ordertag It is optional to apply to an order to identify.
+   *
+   * @param {orderParams} params
    * @returns
    */
   async placeOrder(params) {
@@ -141,18 +123,8 @@ class SmartApi {
   }
 
   /**
-   * Modify Order as long as it is open.
-   * @method
-   * @param  params params required for fetching candle data
-   * @param params.variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
-   * @param params.tradingsymbol  Tradingsymbol of instrument
-   * @param params.symboltoken Token of instrument
-   * @param params.exchange Exchange of instrument
-   * @param params.orderid OrderID of Open Order Present in Orderbook
-   * @param params.producttype Product type (CNC,MIS, NORMAL)
-   * @param params.duration Order duration (DAY,IOC)
-   * @param params.price The min or max price to execute the order at (for LIMIT orders)
-   * @param params.quantity Quantity in Integer.
+   *
+   * @param {modifyOrderParams} params
    * @returns
    */
   async modifyOrder(params) {
@@ -415,3 +387,36 @@ const ArrayInstToMarketDataParams = (mode, instruments = []) => {
 };
 
 export default SmartApi;
+
+/**
+ * @typedef {Object} orderParams
+ * @property {string} tradingsymbol - Trading Symbol of the instrument.
+ * @property {string} symboltoken - Symbol Token is a unique identifier.
+ * @property {string} Exchange - Name of the exchange.
+ * @property {string} transactiontype - BUY or SELL.
+ * @property {string} ordertype - Order type (e.g., MARKET, LIMIT).
+ * @property {number} quantity - Quantity to transact.
+ * @property {string} producttype - Product type (e.g., CNC, MIS).
+ * @property {number} [price] - (Optional) The min or max price to execute the order at (for LIMIT orders).
+ * @property {number} [triggerprice] - (Optional) The price at which an order should be triggered (for SL, SL-M).
+ * @property {number} [squareoff] - (Optional) Only for ROBO (Bracket Order).
+ * @property {number} [stoploss] - (Optional) Only for ROBO (Bracket Order).
+ * @property {number} [trailingStopLoss] - (Optional) Only for ROBO (Bracket Order).
+ * @property {number} [disclosedquantity] - (Optional) Quantity to disclose publicly (for equity trades).
+ * @property {string} [duration] - (Optional) Order duration (e.g., DAY, IOC).
+ * @property {string} [ordertag] - (Optional) Tag to identify the order (max 20 characters).
+ */
+
+/**
+ * Modify Order as long as it is open.
+ * @typedef {Object} modifyOrderParams params required for fetching candle data
+ * @property {String} variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
+ * @property {String} tradingsymbol  Tradingsymbol of instrument
+ * @property {String} symboltoken Token of instrument
+ * @property {String} exchange Exchange of instrument
+ * @property {String} orderid OrderID of Open Order Present in Orderbook
+ * @property {String} producttype Product type (CNC,MIS, NORMAL)
+ * @property {String} duration Order duration (DAY,IOC)
+ * @property {String} price The min or max price to execute the order at (for LIMIT orders)
+ * @property {String} quantity Quantity in Integer.
+ */
