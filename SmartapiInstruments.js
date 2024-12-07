@@ -3,6 +3,23 @@ import axios from "axios";
 
 const filepath = "./instrumentslist.json";
 
+/**
+ * @typedef {Object} Instrument
+ * @property {String} token
+ * @property {String} symbol
+ * @property {String} name
+ * @property {String} expiry
+ * @property {String} strike
+ * @property {String} lotsize
+ * @property {String} instrumenttype
+ * @property {String} exch_seg
+ * @property {String} tick_size
+ */
+
+/**
+ *
+ * @returns {Instrument[]}
+ */
 export function loadFileData() {
   try {
     const filedata = JSON.parse(fs.readFileSync(filepath));
@@ -16,6 +33,7 @@ export function loadFileData() {
     console.log("error loading data ", error);
   }
 }
+
 async function DownloadInstruments() {
   try {
     const startTime = performance.now();
@@ -52,8 +70,8 @@ async function DownloadInstruments() {
  * @param {String} params.tradingsymbol
  * @param {String} params.strike
  * @param {String} params.expiry *
- * @param {any} fd filedata variable
- * @returns
+ * @param {Instrument[]} fd filedata variable
+ * @returns {Instrument[] || Instrument}
  */
 function FindInstrument(params, fd = null) {
   let filedata = fd;
@@ -98,9 +116,8 @@ function FindInstrument(params, fd = null) {
 }
 
 /**
- *
  * @param {{exch_seg : "NFO"|"MCX"|"CDS",name:"",name:"",instrumenttype : "OPTIDX"|"OPTSTX"|"FUTOPT"}} params
- * @returns {Array} ExpiryDates
+ * @returns {String[]} ExpiryDates
  */
 function GetExpiryDates(params, fd) {
   let filedata = fd;
@@ -153,6 +170,10 @@ function FileOldOrNotExits(filePath) {
   }
 }
 
+/**
+ * Download new Instruments for broker
+ * @returns {void}
+ */
 async function CheckInstruments() {
   try {
     const downloadfile = FileOldOrNotExits(filepath);
