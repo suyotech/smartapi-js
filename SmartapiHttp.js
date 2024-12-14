@@ -4,81 +4,6 @@ import totp from "totp-generator";
 
 //Constants
 
-/**
- * @enum {String}
- */
-export const Exchange = {
-  BSE: "BSE",
-  NSE: "NSE",
-  NFO: "NFO",
-  MCX: "MCX",
-  CDS: "CDS",
-};
-
-/**
- * @enum {String}
- */
-export const OrderDuration = {
-  DAY: "DAY",
-  IOC: "IOC",
-};
-
-/**
- * @enum {String}
- */
-// @ts-ignore
-export const ProductType = {
-  DELIVERY: "DELIVERY",
-  CARRYFORWARD: "CARRYFORWARD",
-  MARGIN: "MARGIN",
-  INTRADAY: "INTRADAY",
-  BO: "BO",
-};
-
-/**
- * @enum {String}
- */
-export const OrderType = {
-  MARKET: "MARKET",
-  LIMIT: "LIMIT",
-  STOPLOSS_LIMIT: "STOPLOSS_LIMIT",
-  STOPLOSS_MARKET: "STOPLOSS_MARKET",
-};
-
-/**
- * @enum {String}
- */
-export const TransactionType = {
-  BUY: "BUY",
-  SELL: "SELL",
-  SHORT: "SELL",
-  COVER: "BUY",
-};
-
-/**
- * @enum {String}
- */
-export const Variety = {
-  NORMAL: "NORMAL",
-  STOPLOSS: "STOPLOSS",
-  AMO: "AMO",
-  ROBO: "ROBO",
-};
-
-/**
- * @enum {String}
- */
-export const Timeframe = {
-  ONE_MINUTE: "ONE_MINUTE",
-  THREE_MINUTE: "THREE_MINUTE",
-  FIVE_MINUTE: "FIVE_MINUTE",
-  TEN_MINUTE: "TEN_MINUTE",
-  FIFTEEN_MINUTE: "FIFTEEN_MINUTE",
-  THIRTY_MINUTE: "THIRTY_MINUTE",
-  ONE_HOUR: "ONE_HOUR",
-  ONE_DAY: "ONE_DAY",
-};
-
 class SmartApi {
   constructor(clientID, mpin, apiKey, totpKey) {
     this.clientID = clientID;
@@ -96,6 +21,81 @@ class SmartApi {
     this.debug = false;
     this.InitPromise = this.init();
   }
+
+  /**
+   * @enum {String}
+   */
+  Exchange = {
+    BSE: "BSE",
+    NSE: "NSE",
+    NFO: "NFO",
+    MCX: "MCX",
+    CDS: "CDS",
+  };
+
+  /**
+   * @enum {String}
+   */
+  OrderDuration = {
+    DAY: "DAY",
+    IOC: "IOC",
+  };
+
+  /**
+   * @enum {String}
+   */
+  // @ts-ignore
+  ProductType = {
+    DELIVERY: "DELIVERY",
+    CARRYFORWARD: "CARRYFORWARD",
+    MARGIN: "MARGIN",
+    INTRADAY: "INTRADAY",
+    BO: "BO",
+  };
+
+  /**
+   * @enum {String}
+   */
+  OrderType = {
+    MARKET: "MARKET",
+    LIMIT: "LIMIT",
+    STOPLOSS_LIMIT: "STOPLOSS_LIMIT",
+    STOPLOSS_MARKET: "STOPLOSS_MARKET",
+  };
+
+  /**
+   * @enum {String}
+   */
+  TransactionType = {
+    BUY: "BUY",
+    SELL: "SELL",
+    SHORT: "SELL",
+    COVER: "BUY",
+  };
+
+  /**
+   * @enum {String}
+   */
+  Variety = {
+    NORMAL: "NORMAL",
+    STOPLOSS: "STOPLOSS",
+    AMO: "AMO",
+    ROBO: "ROBO",
+  };
+
+  /**
+   * @enum {String}
+   */
+  Timeframe = {
+    ONE_MINUTE: "ONE_MINUTE",
+    THREE_MINUTE: "THREE_MINUTE",
+    FIVE_MINUTE: "FIVE_MINUTE",
+    TEN_MINUTE: "TEN_MINUTE",
+    FIFTEEN_MINUTE: "FIFTEEN_MINUTE",
+    THIRTY_MINUTE: "THIRTY_MINUTE",
+    ONE_HOUR: "ONE_HOUR",
+    ONE_DAY: "ONE_DAY",
+  };
 
   async init() {
     try {
