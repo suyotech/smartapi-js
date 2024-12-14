@@ -65,13 +65,14 @@ async function DownloadInstruments() {
 /**
  *
  * @param {Object} params
- * @param {String} params.exch_seg
- * @param {String} params.name
- * @param {String} params.tradingsymbol
- * @param {String} params.strike
- * @param {String} params.expiry *
- * @param {Instrument[]} fd filedata variable
- * @returns {Instrument[] || Instrument}
+ * @param {String} [params.exch_seg]
+ * @param {String} [params.name]
+ * @param {String} [params.symbol]
+ * @param {String} [params.strike]
+ * @param {String} [params.expiry]
+ * @param {String} [params.optiontype]
+ * @param {any} fd filedata variable
+ * @returns
  */
 function FindInstrument(params, fd = null) {
   let filedata = fd;
@@ -79,7 +80,7 @@ function FindInstrument(params, fd = null) {
     filedata = loadFileData();
   }
   const instrumentdata = filedata.filter((scrip) => {
-    const isCE = params.optiontype === "CE"; // Check if optiontype is "CE"
+    const isCE = params?.optiontype === "CE"; // Check if optiontype is "CE"
     const isCDS = scrip.exch_seg === "CDS";
 
     const tkswrong = scrip.token.split(" ");

@@ -2,6 +2,83 @@ import axios from "axios";
 import os from "os";
 import totp from "totp-generator";
 
+//Constants
+
+/**
+ * @enum {String}
+ */
+export const Exchange = {
+  BSE: "BSE",
+  NSE: "NSE",
+  NFO: "NFO",
+  MCX: "MCX",
+  CDS: "CDS",
+};
+
+/**
+ * @enum {String}
+ */
+export const OrderDuration = {
+  DAY: "DAY",
+  IOC: "IOC",
+};
+
+/**
+ * @enum {String}
+ */
+// @ts-ignore
+export const ProductType = {
+  DELIVERY: "DELIVERY",
+  CARRYFORWARD: "CARRYFORWARD",
+  MARGIN: "MARGIN",
+  INTRADAY: "INTRADAY",
+  BO: "BO",
+};
+
+/**
+ * @enum {String}
+ */
+export const OrderType = {
+  MARKET: "MARKET",
+  LIMIT: "LIMIT",
+  STOPLOSS_LIMIT: "STOPLOSS_LIMIT",
+  STOPLOSS_MARKET: "STOPLOSS_MARKET",
+};
+
+/**
+ * @enum {String}
+ */
+export const TransactionType = {
+  BUY: "BUY",
+  SELL: "SELL",
+  SHORT: "SELL",
+  COVER: "BUY",
+};
+
+/**
+ * @enum {String}
+ */
+export const Variety = {
+  NORMAL: "NORMAL",
+  STOPLOSS: "STOPLOSS",
+  AMO: "AMO",
+  ROBO: "ROBO",
+};
+
+/**
+ * @enum {String}
+ */
+export const Timeframe = {
+  ONE_MINUTE: "ONE_MINUTE",
+  THREE_MINUTE: "THREE_MINUTE",
+  FIVE_MINUTE: "FIVE_MINUTE",
+  TEN_MINUTE: "TEN_MINUTE",
+  FIFTEEN_MINUTE: "FIFTEEN_MINUTE",
+  THIRTY_MINUTE: "THIRTY_MINUTE",
+  ONE_HOUR: "ONE_HOUR",
+  ONE_DAY: "ONE_DAY",
+};
+
 class SmartApi {
   constructor(clientID, mpin, apiKey, totpKey) {
     this.clientID = clientID;
@@ -100,10 +177,12 @@ class SmartApi {
       totp: totp(this.totpKey),
     });
 
+    // @ts-ignore
+    const { jwtToken, refreshToken, feedToken } = data;
     if (data) {
-      this.jwtToken = data.jwtToken;
-      this.requestToken = data.refreshToken;
-      this.feedToken = data.feedToken;
+      this.jwtToken = jwtToken;
+      this.requestToken = refreshToken;
+      this.feedToken = feedToken;
       this.httpClient.defaults.headers.Authorization = `Bearer ${this.jwtToken}`;
     }
   }
@@ -133,25 +212,30 @@ class SmartApi {
 
   /**
    * Cancel Open Order in OrderBook
+   * @typedef {Object} cancelOrderParams
+   * @property {Variety} variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
+   * @property {String} orderid OrderID of Open Order Present in Orderbook
+   */
+
+  /**
    * @method
-   * @param params
-   * @param params.variety Normal Order (Regular),Stop loss order,After Market Order,ROBO (Bracket Order)
-   * @param params.orderid OrderID of Open Order Present in Orderbook
-   * @returns
+   * @param {cancelOrderParams} params
+   * @returns {Promise<any|undefined>}
    */
   async cancelOrder(params) {
-    return await this.httpClient.post(routes.cancelOrderUrl, params);
+    const data = await this.httpClient.post(routes.cancelOrderUrl, params);
+    return data?.data;
   }
 
   /**
    * @method
    * @async
-   * @returns {Array} of ordebook
+   * @returns {Promise<Array|undefined>} of ordebook
    */
 
   async getOrderBook() {
     const data = await this.httpClient.get(routes.orderBookUrl);
-    return data;
+    return data?.data || undefined;
   }
 
   async getTradeBook() {
@@ -169,6 +253,12 @@ class SmartApi {
     return data;
   }
 
+  /**
+   *
+   * @param {"LTP"} mode
+   * @param {import("./SmartapiInstruments.js").Instrument[]} instrumentlist
+   * @returns
+   */
   async getMarketData(mode = "LTP", instrumentlist = []) {
     if (!Array.isArray(instrumentlist) || !mode) {
       console.log("instrument list null or mode is not defined");
@@ -182,13 +272,8 @@ class SmartApi {
 
   /**
    *
-   * @param params params required for fetching candle data
-   * @param params.exchange  Exchange of instrument
-   * @param params.symboltoken Token of instrument
-   * @param params.interval Timeframe of CandleData use timeframe constant Etc..
-   * @param params.fromdate From Date like 2023-11-16 09:15
-   * @param params.todate To Date like 2023-11-16 09:16
-   * @returns Array of [[datetime,o,h,l,c,v]....]
+   * @param {candleDataParams} params
+   * @returns {Promise<Candle[] | undefined>}
    */
   async getCandleData(params) {
     if (
@@ -201,63 +286,8 @@ class SmartApi {
       throw new Error("some params missing");
     }
     const data = await this.httpClient.post(routes.candleDataUrl, params);
-    return data;
+    return data?.data;
   }
-
-  //Constants
-
-  exchange = {
-    BSE: "BSE",
-    NSE: "NSE",
-    NFO: "NFO",
-    MCX: "MCX",
-    CDS: "CDS",
-  };
-
-  orderDuration = {
-    DAY: "DAY",
-    IOC: "IOC",
-  };
-
-  producttype = {
-    DELIVERY: "DELIVERY",
-    CARRYFORWARD: "CARRYFORWARD",
-    MARGIN: "MARGIN",
-    INTRADAY: "INTRADAY",
-    BO: "BO",
-  };
-
-  ordertype = {
-    MARKET: "MARKET",
-    LIMIT: "LIMIT",
-    STOPLOSS_LIMIT: "STOPLOSS_LIMIT",
-    STOPLOSS_MARKET: "STOPLOSS_MARKET",
-  };
-
-  transactiontype = {
-    BUY: "BUY",
-    SELL: "SELL",
-    SHORT: "SELL",
-    COVER: "BUY",
-  };
-
-  variety = {
-    NORMAL: "NORMAL",
-    STOPLOSS: "STOPLOSS",
-    AMO: "AMO",
-    ROBO: "ROBO",
-  };
-
-  timeframe = {
-    ONE_MINUTE: "ONE_MINUTE",
-    THREE_MINUTE: "THREE_MINUTE",
-    FIVE_MINUTE: "FIVE_MINUTE",
-    TEN_MINUTE: "TEN_MINUTE",
-    FIFTEEN_MINUTE: "FIFTEEN_MINUTE",
-    THIRTY_MINUTE: "THIRTY_MINUTE",
-    ONE_HOUR: "ONE_HOUR",
-    ONE_DAY: "ONE_DAY",
-  };
 }
 //utils functions
 
@@ -419,4 +449,23 @@ export default SmartApi;
  * @property {String} duration Order duration (DAY,IOC)
  * @property {String} price The min or max price to execute the order at (for LIMIT orders)
  * @property {String} quantity Quantity in Integer.
+ */
+
+/**
+ * @typedef {Object} Candle
+ * @property {String} time
+ * @property {Number} open
+ * @property {Number} high
+ * @property {Number} low
+ * @property {Number} close
+ * @property {Number} volume
+ */
+
+/**
+ * @typedef {Object} candleDataParams params required for fetching candle data
+ * @property {String} exchange  Exchange of instrument
+ * @property {String} symboltoken Token of instrument
+ * @property {String} interval Timeframe of CandleData use timeframe constant Etc..
+ * @property {String} fromdate From Date like 2023-11-16 09:15
+ * @property {String} todate To Date like 2023-11-16 09:16
  */
