@@ -235,7 +235,7 @@ class SmartApi {
 
   async getOrderBook() {
     const data = await this.httpClient.get(routes.orderBookUrl);
-    return data?.data || undefined;
+    return data;
   }
 
   async getTradeBook() {
