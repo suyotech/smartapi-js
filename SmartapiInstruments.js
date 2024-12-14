@@ -65,11 +65,13 @@ async function DownloadInstruments() {
 /**
  *
  * @param {Object} params
- * @param {String} [params.exch_seg]
- * @param {String} [params.name]
+ * @param {String} [params.token]
  * @param {String} [params.symbol]
- * @param {String} [params.strike]
+ * @param {String} [params.name]
  * @param {String} [params.expiry]
+ * @param {String} [params.strike]
+ * @param {String} [params.instrumenttype]
+ * @param {String} [params.exch_seg]
  * @param {String} [params.optiontype]
  * @param {any} fd filedata variable
  * @returns

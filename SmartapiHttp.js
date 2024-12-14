@@ -195,7 +195,7 @@ class SmartApi {
   /**
    *
    * @param {orderParams} params
-   * @returns
+   * @returns {Promise<{script : String,orderid : String,uniqueorderid : String} | undefined>}
    */
   async placeOrder(params) {
     return await this.httpClient.post(routes.placeOrderUrl, params);
