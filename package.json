@@ -1,6 +1,6 @@
 {
   "name": "smartapi-js",
-  "version": "1.0.10",
+  "version": "1.0.2",
   "description": "",
   "main": "./index.js",
   "type": "module",

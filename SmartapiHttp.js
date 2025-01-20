@@ -420,6 +420,7 @@ export default SmartApi;
 
 /**
  * @typedef {Object} orderParams
+ * @property {string} variety - Order Variety (NORMAL,STOPLOSS,AMO,ROBO)
  * @property {string} tradingsymbol - Trading Symbol of the instrument.
  * @property {string} symboltoken - Symbol Token is a unique identifier.
  * @property {string} exchange - Name of the exchange.
