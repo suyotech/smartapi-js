@@ -1,7 +1,7 @@
 {
   "name": "smartapi-js",
-  "version": "1.0.2",
-  "description": "",
+  "version": "1.0.4",
+  "description": "Unofficial angelone.in smartapi sdk",
   "main": "./index.js",
   "type": "module",
   "scripts": {
