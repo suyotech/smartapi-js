@@ -1,6 +1,6 @@
-import SmartApi from "./SmartapiHttp.js";
-import SmartapiInstruments from "./SmartapiInstruments.js";
-import HistoricalDataProvider from "./HistoricalDataProvider.js";
-import SmartapiWS40 from "./SmartapiWS40.js";
+import SmartApi from "./lib/SmartapiHttp.js";
+import SmartapiInstruments from "./lib/SmartapiInstruments.js";
+import SmartapiWS40 from "./lib/SmartapiWS40.js";
+import HistoricalDataProvider from "./lib/HistoricalDataProvider.js";
 
-export { SmartApi, SmartapiInstruments, HistoricalDataProvider, SmartapiWS40 };
+export { SmartApi, SmartapiInstruments, SmartapiWS40, HistoricalDataProvider };

@@ -1,19 +1,22 @@
 {
-  "name": "smartapi-js",
+  "name": "@suyotech-dev/smartapi-js",
   "version": "1.0.5",
-  "description": "Unofficial angelone.in smartapi sdk",
-  "main": "./index.js",
+  "main": "./lib/index.js",
   "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "exports": {
+    ".": {
+      "import": "./lib/index.js"
+    }
   },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
-  },
-  "keywords": [],
-  "author": "Suyog Patil",
+  "keywords": [
+    "smartapi",
+    "nodejs",
+    "api",
+    "suyotech"
+  ],
+  "author": "https://suyotech.com",
   "license": "MIT",
+  "description": "Unofficial sdk for smartapi angelone developed by suyotech.com",
   "dependencies": {
     "axios": "^1.7.7",
     "binary-parser": "^2.2.1",
