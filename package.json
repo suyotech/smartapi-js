@@ -1,6 +1,6 @@
 {
   "name": "@suyotech-dev/smartapi-js",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "./lib/index.js",
   "type": "module",
   "exports": {
