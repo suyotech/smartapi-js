@@ -1,6 +1,6 @@
 {
   "name": "@suyotech-dev/smartapi-js",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "main": "./lib/index.js",
   "type": "module",
   "exports": {
@@ -21,12 +21,12 @@
   "license": "MIT",
   "description": "Unofficial sdk for smartapi angelone developed by suyotech.com",
   "dependencies": {
-    "axios": "^1.7.7",
+    "axios": "^1.11.0",
     "binary-parser": "^2.2.1",
     "node-cron": "^3.0.3",
     "os": "^0.1.2",
     "totp-generator": "^0.0.14",
     "uuid": "^9.0.1",
-    "ws": "^8.18.0"
+    "ws": "^8.18.3"
   }
 }
